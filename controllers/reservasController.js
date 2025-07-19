@@ -1,8 +1,6 @@
-//base simple
 let reservas = [
     {
-
-        id: "1",
+        id: "1", 
         hotel: "Hotel Gatuno",
         tipo_habitacion: "doble",
         num_huespedes: "2",
@@ -18,6 +16,21 @@ exports.obtenerReservas = (req, res) => {
         datos: reservas 
     });
 };
+//funcion para obtener reserva por id
+exports.obtenerReservaPorId = (req, res) => {
+    const { id } = req.params;
+    const reserva = reservas.find(r => r.id === id);
+
+    if (!reserva) {
+        return res.status(404).json({
+            mensaje: "Reserva no encontrada"
+        });
+    }
+    res.json({
+        mensaje: "Reserva encontrada",
+        datos: reserva
+    });
+}; 
 
 //funcion para nueva reserva 
 exports.crearReserva = (req, res) => {
@@ -38,5 +51,50 @@ exports.crearReserva = (req, res) => {
     res.json({
         mensaje: "Reserva creada correctamente",
         datos: nuevaReserva
+    });
+}
+//actualizar reserva
+exports.actualizarReserva = (req, res) => {
+    const { id } = req.params;
+     
+    if (Object.keys(req.body).length === 0) {
+        return res.status(400).json({ mensaje: "Debes enviar datos para actualizar" });
+    }
+
+    const reservaIndex = reservas.findIndex(reserva => reserva.id === id);
+    
+    if (reservaIndex === -1) {
+        return res.status(404).json({ mensaje: "Reserva no encontrada" });
+    }
+
+    
+    reservas[reservaIndex] = { 
+        ...reservas[reservaIndex],
+        ...req.body
+    };
+
+    res.json({ 
+        mensaje: "Reserva actualizada", 
+        datos: reservas[reservaIndex] 
+    });
+};
+//funcion para eliminar reserva
+exports.eliminarReserva = (req, res) => {
+    const { id } = req.params;
+   
+    const reservaIndex = reservas.findIndex(r => r.id === id);
+
+    if (reservaIndex === -1) {
+        return res.status(404).json({
+            mensaje: "Reserva no encontrada",
+            error: true
+        });
+    }
+    const reservaEliminada = reservas.splice(reservaIndex, 1);
+
+    res.json({
+        mensaje: "Reserva eliminada correctamente",
+        datos: reservaEliminada[0],
+        error: false
     });
 }
