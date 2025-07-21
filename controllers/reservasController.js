@@ -1,3 +1,5 @@
+const { parse } = require("dotenv");
+
 let reservas = [
     {
         id: "1", 
@@ -39,6 +41,18 @@ exports.crearReserva = (req, res) => {
             mensaje: "Todos los campos son obligatorios"
         });
     }
+    //validar fechas
+    if (new Date(req.body.fecha_inicio) >= new Date(req.body.fecha_fin)) {
+        return res.status(400).json({
+            mensaje: "La fecha de inicio debe ser anterior a la fecha de fin"
+        });
+    }
+    //validar numero de huespedes
+    if (parseInt(req.body.num_huespedes) <= 0) {
+        return res.status(400).json({
+            mensaje: "El número de huéspedes debe ser mayor a 0"
+        });
+    }
     const nuevaReserva = {
         id: (reservas.length + 1).toString(),
         hotel: req.body.hotel,
@@ -59,6 +73,18 @@ exports.actualizarReserva = (req, res) => {
      
     if (Object.keys(req.body).length === 0) {
         return res.status(400).json({ mensaje: "Debes enviar datos para actualizar" });
+    }
+    if (req.body.fecha_inicio && req.body.fecha_fin) {
+        if (new Date(req.body.fecha_inicio) >= new Date(req.body.fecha_fin)) {
+            return res.status(400).json({
+                mensaje: "La fecha de inicio debe ser anterior a la fecha de fin"
+            });
+        }
+    }
+    if (req.body.num_huespedes && parseInt(req.body.num_huespedes) <= 0) {
+        return res.status(400).json({
+            mensaje: "El número de huéspedes debe ser mayor a 0"
+        });
     }
 
     const reservaIndex = reservas.findIndex(reserva => reserva.id === id);
